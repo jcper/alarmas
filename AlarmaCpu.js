@@ -11,11 +11,18 @@ var i=0;
 var EmisorEventos = eventos.EventEmitter;
 var ee=new EmisorEventos();
 var readline = require('readline');
-var limite=0.80;
-var tiempo=10000;
-var  WebSocket= require('ws');
+var limite=0.80;//carga cpu.
+var limiteRam=1073741824;//1 Gb memoria libre
+
+var tiempo=100000;//cada minuto lanza el evento.
+var WebSocket= require('ws');
 var url='ws://localhost:3000/';
 var ws = new WebSocket(url);
+var user=os.userInfo([username]);
+var alarma={"name":user,"alarma":0, "date":new date().toString()}//valores iniciales
+var myJSON=JSON.stringify(alarma);//valores iniciales
+var AlarmStatus=false;
+
  
  var options = stdio.getopt({
 	'limite': {
@@ -35,78 +42,48 @@ var ws = new WebSocket(url);
 //tiempo=options.tiempo;
 
 function Vigilante(limite){
-if(limite!==0.01){
-if(os.loadavg()[0]>limite){
- i++;
-console.log('Carga Cpu : '+os.loadavg()[0]);
-console.log('Tiempo [ms]: '+os.uptime());
-console.log('Memoria Total: ' + os.totalmem());
-console.log('Memoria Libre: ' + os.freemem());
- ps.lookup({
-    command: 'ps',
-    psargs: ' -aux'
-    }, function(err, resultList ) {
-    if (err) {
-        throw new Error( err );
-    }
+if(limite!==0.01 && limiteRam!==0.01){
 
-    resultList.forEach(function( process ){
-        if( process ){
-            console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-        }
-    });
-});
-
-console.log('Sobrecarga cpu hace 1 minuto'+' Registro: '+i); 
- }
 if(os.loadavg()[1]>limite){
- i++;
+ i++;//indice de registros
 console.log('Carga Cpu: ' +os.loadavg()[1]);
 console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
- ps.lookup({
-    command: 'ps',
-    psargs: ' -aux'
-    }, function(err, resultList ) {
-    if (err) {
-        throw new Error( err );
-    }
-
-    resultList.forEach(function( process ){
-    if( process ){
-  var data=' Carga Cpu:' +os.loadavg()[1]+' Tiempo [ms]:'+os.uptime()+' Memoria Total:' + os.totalmem()+' Memoria Libre: ' + os.freemem()+' PID:' + process.pid + ' COMMAND:' + process.command + ' ARGUMENTS:' +
-  process.arguments+ '\n';
-
-   fs.appendFile('Alarma.log',data, function(err) {
-    if( err ){
-        console.log( err );
-    }
-   
-});
- console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-        }
-    });
-});
-
-
+ AlarmStatus=true// se produce alarma.
+ alarma={"name":user,"alarma":1, "date":new date().toString()};
 console.log('Sobrecarga cpu hace 5 minutos'+' Registro: '+i);
 }
-if(os.loadavg()[2]>limite){
- i++;
- console.log('Carga Cpu: '+os.loadavg()[2]);
- console.log('Tiempo [ms]: '+os.uptime());
- console.log('Memoria Total: ' + os.totalmem())
- console.log('Memoria Libre: ' + os.freemem());
- console.log('Sobrecarga cpu hace 15 minutos'+' Registro: '+i);
-  }
- }
+
+if(os.freemem()>limiteRam){
+ i++;//indice de registros
+console.log('Carga Cpu: ' +os.loadavg()[1]);
+console.log('Tiempo [ms]: '+os.uptime());
+console.log('Memoria Total: ' + os.totalmem());
+console.log('Memoria Libre: ' + os.freemem());
+AlarmStatus=true// se produce alarma.
+var 
+alarma={"name":user,"alarma":2, "date":new date().toString()};
+
+ console.log('Memoria Ram Libre  hace 5 minutos'+' Registro: '+i);
 }
-  if(limite!==0.01){
+  }
+}
+
+//Se resetea AlarmStatus
+
+if(AlarmStatus=true && os.freemem()<limiteRam && os.loadavg()[1]<limite){
+
+    AlarmStatus=false;//Se vuelve a restablecer el sistema sin alarmas
+   alarma={"name":user,"alarma":0, "date":new date().toString()}//valores iniciales
+}
+
+
+  if(limite!==0.01 && AlarmStatus==false){
  ee.on('datos', function Vigilante(limite){
  console.log('Alarma sobrecarga funcionando testeando');
  ws.on('message', function() {
-    ws.send('AlarmaPrueba funcionando');
+    ws.send(myJSON);
  });
 
  }); 
