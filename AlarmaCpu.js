@@ -13,13 +13,13 @@ var ee=new EmisorEventos();
 var readline = require('readline');
 var limite=0.80;//carga cpu.
 var limiteRam=1073741824;//1 Gb memoria libre
-
+var dateAlarm=new Date().toTimeString();
 var tiempo=100000;//cada minuto lanza el evento.
 var WebSocket= require('ws');
-var url='ws://localhost:3000/';
+var url='ws://localhost:8080/';
 var ws = new WebSocket(url);
-var user=os.userInfo([username]);
-var alarma={"name":user,"alarma":0, "date":new date().toString()}//valores iniciales
+const user=require('username');
+var alarma={"name":user,"alarma":0, "date":dateAlarm}//valores iniciales
 var myJSON=JSON.stringify(alarma);//valores iniciales
 var AlarmStatus=false;
 
@@ -51,7 +51,7 @@ console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
  AlarmStatus=true// se produce alarma.
- alarma={"name":user,"alarma":1, "date":new date().toString()};
+ alarma={"name":user,"alarma":1, "date":dateAlarm};
 console.log('Sobrecarga cpu hace 5 minutos'+' Registro: '+i);
 }
 
@@ -63,7 +63,7 @@ console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
 AlarmStatus=true// se produce alarma.
 var 
-alarma={"name":user,"alarma":2, "date":new date().toString()};
+alarma={"name":user,"alarma":2, "date":dateAlarm};
 
  console.log('Memoria Ram Libre  hace 5 minutos'+' Registro: '+i);
 }
@@ -75,7 +75,7 @@ alarma={"name":user,"alarma":2, "date":new date().toString()};
 if(AlarmStatus=true && os.freemem()<limiteRam && os.loadavg()[1]<limite){
 
     AlarmStatus=false;//Se vuelve a restablecer el sistema sin alarmas
-   alarma={"name":user,"alarma":0, "date":new date().toString()}//valores iniciales
+   alarma={"name":user,"alarma":0, "date":dateAlarm}//valores iniciales
 }
 
 
