@@ -13,12 +13,10 @@ var ee=new EmisorEventos();
 var readline = require('readline');
 var limite=0.70;//carga cpu.
 var limiteRam=1073741824;//1 Gb memoria libre
-var dateAlarm=new Date().toTimeString();
 var tiempo=10000;//cada minuto lanza el evento.
 var WebSocket= require('ws');
 var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
-//var myip = require('quick-local-ip');
 var publicIp = require('public-ip');
 var alarma='';
 var AlarmStatus=false;
@@ -33,7 +31,7 @@ var ip_publica=publicIp.v4().then(ip => {
 });
  
  
- function Vigilante(limite){
+ function Vigilante(limite,limiteRam){
 
 if(limite!==0.01 && limiteRam!==0.01){
 
@@ -46,23 +44,24 @@ console.log('Memoria Libre: ' + os.freemem());
  AlarmStatus=true// se produce alarma.
  alarma={"name":user,"alarma":1, "date":new Date().toTimeString(),"ip":ip_publica,};
 
- if(i!==10){
- 	var data=alarma;
- 	 fs.appendFile('Alarma.log',data, function(err) {
+ if(i<10){
+ 	var data={};
+   data=alarma.name+alarma.alarma+alarma.date+alarma.ip;
+ 	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
     }
   });
  }else{
   //borramos fichero y luego lo creamos con el registro 
-   fs.unlink('Alarma.log', (err) => {
+   fs.unlink('Alarma.txt', (err) => {
   if (err) throw err;
   console.log('successfully deleted Alarma.log');
    });
 
    //luego lo creamos con el registro 1
    i=1;
- 	 fs.appendFile('Alarma.log',data, function(err) {
+ 	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
     }
@@ -83,23 +82,24 @@ console.log('Memoria Libre: ' + os.freemem());
 AlarmStatus=true// se produce alarma.
 alarma={"name":user,"alarma":2, "date":new Date().toTimeString(),"ip":ip_publica};
 
-if(i!==10){
- 	var data=alarma;
- 	 fs.appendFile('Alarma.log',data, function(err) {
+if(i<10){
+ 	var data={};
+  data=alarma.name+alarma.alarma+alarma.date+alarma.ip;
+ 	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
     }
   });
  }else{
   //borramos fichero y luego lo creamos con el registro 
-   fs.unlink('Alarma.log', (err) => {
+   fs.unlink('Alarma.txt', (err) => {
   if (err) throw err;
   console.log('successfully deleted Alarma.log');
    });
 
    //luego lo creamos con el registro 1
    i=1;
- 	 fs.appendFile('Alarma.log',data, function(err) {
+ 	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
     }
@@ -108,6 +108,9 @@ if(i!==10){
  console.log('Memoria Ram Libre  hace 5 minutos'+' Registro: '+i);
    }
  }
+ if(!AlarmStatus){
+alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
+  }
 } 
 
 
@@ -120,24 +123,45 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
 }
 
  //si no hay alarma
- ee.on('datos', function Vigilante(limite){
+ ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
  });
 
-  if(!AlarmStatus){
-alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
-console.log('ip'+ip_publica);
+  
+
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
   ws.send(myjson);
-   myjson='';
    console.log('cliente1: %s', message); 
+     var mensaje=JSON.parse(message);
+    
+
+     console.log('bodytext'+mensaje.user);
+      
+       if(mensaje.user===user && mensaje.comando==='restaurar'){
+
+           console.log(mensaje.comando);
+       }
+
+      if(mensaje.user===user && mensaje.comando==='notificar'){
+
+          console.log(mensaje.comando);
+
+      }
+
+       if(mensaje.user===user && mensaje.comando==='buscar'){
+
+         
+         console.log(mensaje.comando);
+      }
+
+
     });
-  }
+  
  
 
   //Lanzamos el emisor de eventos
 setInterval(function(){
- ee.emit('datos',Vigilante(limite));
+ ee.emit('datos',Vigilante(limite,limiteRam));
   }, tiempo);
 
