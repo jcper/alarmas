@@ -2,6 +2,8 @@
 
 var os = require('os');
 var ps = require('ps-nodejs');
+// Child process is required to spawn any kind of asynchronous process
+var childProcess = require("child_process");
 var eventos = require('events');
 var process= require('process');
 var util = require('util');
@@ -19,6 +21,12 @@ var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
 var publicIp = require('public-ip');
 var alarma='';
+var restaurar='';
+var restaurarJson='';
+var notificar='';
+var notificarJson='';
+var buscar='';
+var buscarJson='';
 var AlarmStatus=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
@@ -139,20 +147,49 @@ myjson=JSON.stringify(alarma);
      console.log('bodytext'+mensaje.user);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
+           origPath='fichero1.txt',
+           newPath='temp/fichero1.txt'
 
+           fs.rename(oldPath, newPath, function(error){
+          if(error)
+         throw error;
+         });
            console.log(mensaje.comando);
+          restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
+          restaurarJson=JSON.stringify(restaurar);
+          ws.send(restaurarJson);
+         
        }
 
       if(mensaje.user===user && mensaje.comando==='notificar'){
+        console.log(mensaje.comando);
+    
+       // This line initiates bash
+       var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
+      //var script_process = childProcess.spawn('test.bat',[],{env: process.env})// si fuera en windows.
+      // Echoes any command output 
+       script_process.stdout.on('data', function (data) {
+      console.log('stdout: ' + data);
+      // Error output
+       script_process.stderr.on('data', function (data) {
+       console.log('stderr: ' + data);
+       });
+       // Process exit
+       script_process.on('close', function (code) {
+      console.log('child process exited with code ' + code);
+       });
 
-          console.log(mensaje.comando);
+       notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
+        notificarJson=JSON.stringify(notificar);
+        ws.send(notificarJson);   
 
       }
 
        if(mensaje.user===user && mensaje.comando==='buscar'){
-
-         
-         console.log(mensaje.comando);
+        console.log(mensaje.comando);
+        buscar={"name":user,"comando":'buscar',"date":new Date().toTimeString(),"ip":ip_publica};
+        buscarJson=JSON.stringify(buscar);
+        ws.send(buscarJson);
       }
 
 
