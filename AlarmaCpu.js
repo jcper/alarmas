@@ -20,6 +20,11 @@ var WebSocket= require('ws');
 var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
 var publicIp = require('public-ip');
+var rutaWINXP='c:/archivos de programa/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+var rutaWINXPretail='c:/archivos de programa/igt microelectronics/Agora retail/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+var rutaWIN7='c:/archivos de programa86/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+var rutaWin7retail='c:/archivos de programa86/igt microelectronics/Agora retail/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+var rutaActual='';
 var alarma='';
 var mensaje='';
 var restaurar='';
@@ -31,6 +36,7 @@ var buscarJson='';
 var AlarmStatus=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
+var plataforma=os.platform();
 var ip_publica=publicIp.v4().then(ip => {
     console.log(ip);
     ip_publica=ip;
@@ -38,7 +44,50 @@ var ip_publica=publicIp.v4().then(ip => {
     alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
   
 });
- 
+ console.log("S.0: "+plataforma);
+
+  //Comprobamos que los ficheros existen.
+  if(os.plaftorm==='win32'){
+   fs.stat(rutaWINXP, function(err, stats) {
+      rutaActual=rutaWINXP;
+      if (err && err.errno === 34) {
+       console.log('Fichero no existe');
+    } else {
+      //just in case there was a different error:
+      callback(err)
+    }
+   });
+
+     fs.stat(rutaWINXPretail, function(err, stats) {
+      rutaActual=rutaWINXPretail;
+      if (err && err.errno === 34) {
+       console.log('Fichero no existe');
+    } else {
+      //just in case there was a different error:
+      callback(err)
+    }
+   });
+
+      fs.stat(rutaWIN7, function(err, stats) {
+      rutaActual=rutaWIN7;
+      if (err && err.errno === 34) {
+       console.log('Fichero no existe');
+    } else {
+      //just in case there was a different error:
+      callback(err)
+    }
+   });
+        fs.stat(rutaWin7retail, function(err, stats) {
+      rutaActual=rutaWINXPretail;
+      if (err && err.errno === 34) {
+       console.log('Fichero no existe');
+    } else {
+      //just in case there was a different error:
+      callback(err)
+    }
+   });
+
+  }
  
  function Vigilante(limite,limiteRam){
 
@@ -147,8 +196,8 @@ myjson=JSON.stringify(alarma);
     console.log('usuario: '+mensaje.user);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
-           oldPath='fichero1.txt',
-           newPath='temp/fichero1.txt';
+           oldPath='lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+           newPath=rutaActual;
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
          });
@@ -178,8 +227,9 @@ myjson=JSON.stringify(alarma);
        script_process.on('close', function (code) {
       console.log('child process exited with code ' + code);
        });
-           oldPath='temp/fichero1.txt',
-           newPath='fichero1.txt';
+
+           oldPath=rutaActual,
+           newPath='lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml';
            
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
