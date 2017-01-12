@@ -21,6 +21,7 @@ var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
 var publicIp = require('public-ip');
 var alarma='';
+var mensaje='';
 var restaurar='';
 var restaurarJson='';
 var notificar='';
@@ -139,20 +140,17 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
 
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
+
   ws.send(myjson);
    console.log('cliente1: %s', message); 
-     var mensaje=JSON.parse(message);
-    
-
-     console.log('bodytext'+mensaje.user);
+     mensaje=JSON.parse(message);
+    console.log('usuario: '+mensaje.user);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
-           origPath='fichero1.txt',
-           newPath='temp/fichero1.txt'
-
-           fs.rename(oldPath, newPath, function(error){
-          if(error)
-         throw error;
+           oldPath='fichero1.txt',
+           newPath='temp/fichero1.txt';
+       fs.rename(oldPath, newPath, function(err){
+          if(err) throw err;
          });
            console.log(mensaje.comando);
           restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
@@ -162,7 +160,7 @@ myjson=JSON.stringify(alarma);
        }
 
       if(mensaje.user===user && mensaje.comando==='notificar'){
-        console.log(mensaje.comando);
+        console.log(message.comando);
     
        // This line initiates bash
        var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
@@ -170,6 +168,8 @@ myjson=JSON.stringify(alarma);
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
       console.log('stdout: ' + data);
+       });
+
       // Error output
        script_process.stderr.on('data', function (data) {
        console.log('stderr: ' + data);
@@ -178,24 +178,29 @@ myjson=JSON.stringify(alarma);
        script_process.on('close', function (code) {
       console.log('child process exited with code ' + code);
        });
-
+           oldPath='temp/fichero1.txt',
+           newPath='fichero1.txt';
+           
+       fs.rename(oldPath, newPath, function(err){
+          if(err) throw err;
+         });
        notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
         ws.send(notificarJson);   
 
       }
 
-       if(mensaje.user===user && mensaje.comando==='buscar'){
-        console.log(mensaje.comando);
+       if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL'){
+        console.log(message.comando);
         buscar={"name":user,"comando":'buscar',"date":new Date().toTimeString(),"ip":ip_publica};
         buscarJson=JSON.stringify(buscar);
         ws.send(buscarJson);
       }
-
+     
 
     });
   
- 
+   
 
   //Lanzamos el emisor de eventos
 setInterval(function(){
