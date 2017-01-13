@@ -187,9 +187,6 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
  });
 
  ws.on('open', function(){
- 
- 
-
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
@@ -197,7 +194,14 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
 
 });
 
- 
+ ws.on('error', function (e) {
+    console.log('Client #%d error: %s', e.message);
+    fs.appendFile('Alarma.txt',e.message, function(err) {
+    if( err ){
+        console.log( err );
+    }
+     });
+  });
 
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
