@@ -13,13 +13,13 @@ var i=0;
 var EmisorEventos = eventos.EventEmitter;
 var ee=new EmisorEventos();
 var readline = require('readline');
+var publicIp = require('public-ip');
 var limite=0.70;//carga cpu.
 var limiteRam=1073741824;//1 Gb memoria libre
-var tiempo=10000;//cada minuto lanza el evento.
+var tiempo=10000;//cada 10 segundos lanza el evento.
 var WebSocket= require('ws');
 var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
-var publicIp = require('public-ip');
 var rutaWINXP='c:/archivos de programa/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
 var rutaWINXPretail='c:/archivos de programa/igt microelectronics/Agora retail/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
 var rutaWIN7='c:/archivos de programa86/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
@@ -37,13 +37,14 @@ var AlarmStatus=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
-var ip_publica=publicIp.v4().then(ip => {
-    console.log(ip);
-    ip_publica=ip;
+ var ip_publica=publicIp.v4().then(ip => {
+   console.log(ip);
+   ip_publica=ip;
     console.log(ip_publica);
-    alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
+   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
   
-});
+ });
+
  console.log("S.0: "+plataforma);
 
   //Comprobamos que los ficheros existen.
@@ -185,7 +186,18 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
  console.log('Alarma testeando' + AlarmStatus);
  });
 
-  
+ ws.on('open', function(){
+ 
+ 
+
+  alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
+  myjson=JSON.stringify(alarma);
+  ws.send(myjson);
+  console.log("cliente conectado");
+
+});
+
+ 
 
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
