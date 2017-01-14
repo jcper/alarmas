@@ -132,7 +132,7 @@ console.log('Memoria Libre: ' + os.freemem());
 
 
 
-if(os.freemem()>limiteRam){
+if(os.freemem()<limiteRam){
  i++;//indice de registros
 console.log('Carga Cpu: ' +os.loadavg()[1]);
 console.log('Tiempo [ms]: '+os.uptime());
@@ -175,7 +175,7 @@ alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
 
 //Se resetea AlarmStatus
 
-if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
+if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 
     AlarmStatus=false;//Se vuelve a restablecer el sistema sin alarmas
    alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}//valores iniciales
@@ -185,15 +185,15 @@ if(AlarmStatus && os.freemem()<limiteRam && os.loadavg()[1]<limite){
  ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
  });
-
+ if(ws.readyState===3 || ws.readyState===1 || ws.readyState===0 || ws.readyState===2){
  ws.on('open', function(){
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
 
-});
-
+  });
+}
  ws.on('error', function (e) {
     console.log('Client #%d error: %s', e.message);
     fs.appendFile('Alarma.txt',e.message, function(err) {
