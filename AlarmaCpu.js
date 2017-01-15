@@ -34,6 +34,7 @@ var notificarJson='';
 var buscar='';
 var buscarJson='';
 var AlarmStatus=false;
+var comando=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
@@ -206,12 +207,20 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
 
-  ws.send(myjson);
+  //ws.send(myjson);
    console.log('cliente1: %s', message); 
-     mensaje=JSON.parse(message);
+    mensaje=JSON.parse(message);
+     if(mensaje.comando!=='buscar' || mensaje.comando!=='restaurar' || mensaje.comando!=='notificar' || mensaje.comando!==undefined) {
+       ws.send(myjson);
+     }
+    
+     
+       
+    
     console.log('usuario: '+mensaje.user);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
+           comando=true;//Solo envia el mensaje una vez
            oldPath='lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
            newPath=rutaActual;
        fs.rename(oldPath, newPath, function(err){
@@ -221,12 +230,13 @@ myjson=JSON.stringify(alarma);
           restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
           restaurarJson=JSON.stringify(restaurar);
           ws.send(restaurarJson);
+          comando=false;
          
        }
 
       if(mensaje.user===user && mensaje.comando==='notificar'){
         console.log(message.comando);
-    
+        comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
        var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
       //var script_process = childProcess.spawn('test.bat',[],{env: process.env})// si fuera en windows.
@@ -253,16 +263,20 @@ myjson=JSON.stringify(alarma);
        notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
         ws.send(notificarJson);   
-
+        comando=false;
       }
 
        if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL'){
         console.log(message.comando);
+         comando=true;//Solo envia el mensaje una vez
+        console.log();
         buscar={"name":user,"comando":'buscar',"date":new Date().toTimeString(),"ip":ip_publica};
         buscarJson=JSON.stringify(buscar);
         ws.send(buscarJson);
+        comando=false;
       }
      
+       console.log(comando);
 
     });
   
