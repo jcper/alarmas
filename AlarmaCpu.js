@@ -10,6 +10,7 @@ var util = require('util');
 var stdio = require('stdio');
 var fs = require('fs');
 var i=0;
+var DateNot;
 var EmisorEventos = eventos.EventEmitter;
 var ee=new EmisorEventos();
 var readline = require('readline');
@@ -196,7 +197,7 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
   });
 }
  ws.on('error', function (e) {
-    console.log('Client #%d error: %s', e.message);
+    console.log('cliente1 %d error: %s', e.message);
     fs.appendFile('Alarma.txt',e.message, function(err) {
     if( err ){
         console.log( err );
@@ -206,18 +207,11 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 
 ws.on('message', function(message) {
 myjson=JSON.stringify(alarma);
-
-  //ws.send(myjson);
+    ws.send(myjson);
    console.log('cliente1: %s', message); 
     mensaje=JSON.parse(message);
-     if(mensaje.comando!=='buscar' || mensaje.comando!=='restaurar' || mensaje.comando!=='notificar' || mensaje.comando!==undefined) {
-       ws.send(myjson);
-     }
-    
-     
-       
-    
-    console.log('usuario: '+mensaje.user);
+   
+     console.log('usuario: '+mensaje.user);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
            comando=true;//Solo envia el mensaje una vez
@@ -229,12 +223,14 @@ myjson=JSON.stringify(alarma);
            console.log(mensaje.comando);
           restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
           restaurarJson=JSON.stringify(restaurar);
-          ws.send(restaurarJson);
+          for( i=0; i<30; i++ ){
+           ws.send(restaurarJson);
+           }
           comando=false;
          
        }
 
-      if(mensaje.user===user && mensaje.comando==='notificar'){
+      if(mensaje.user===user && mensaje.comando==='notificar'  ){
         console.log(message.comando);
         comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
@@ -262,22 +258,27 @@ myjson=JSON.stringify(alarma);
          });
        notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
-        ws.send(notificarJson);   
+        for( i=0; i<30; i++ ){
+        ws.send(notificarJson);
+         }   
         comando=false;
       }
 
-       if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL'){
+       if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL' ){
         console.log(message.comando);
          comando=true;//Solo envia el mensaje una vez
-        console.log();
         buscar={"name":user,"comando":'buscar',"date":new Date().toTimeString(),"ip":ip_publica};
         buscarJson=JSON.stringify(buscar);
+
+         for( i=0; i<30; i++ ){
         ws.send(buscarJson);
+         }   
+        
+       
         comando=false;
       }
-     
        console.log(comando);
-
+       
     });
   
    
