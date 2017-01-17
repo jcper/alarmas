@@ -186,16 +186,39 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
  //si no hay alarma
  ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
+   //Reiniciamos la conexion con un reiniciar.bat
+   var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
+      // Echoes any command output 
+       script_process.stdout.on('data', function (data) {
+      console.log('stdout: ' + data);
+       });
+
+      // Error output
+       script_process.stderr.on('data', function (data) {
+       console.log('stderr: ' + data);
+       });
+       // Process exit
+       script_process.on('close', function (code) {
+      console.log('child process exited with code ' + code);
+       });
+
+
  });
+
+ //Iniciamos ocnexion
  if(ws.readyState===3 || ws.readyState===1 || ws.readyState===0 || ws.readyState===2){
  ws.on('open', function(){
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
-
   });
 }
+
+
+
+
+
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
     fs.appendFile('Alarma.txt',e.message, function(err) {
