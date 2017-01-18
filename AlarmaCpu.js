@@ -35,6 +35,7 @@ var notificarJson='';
 var buscar='';
 var buscarJson='';
 var AlarmStatus=false;
+var conectado=true;
 var comando=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
@@ -186,7 +187,9 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
  //si no hay alarma
  ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
-   //Reiniciamos la conexion con un reiniciar.bat
+   if(ws.readyState!==1){
+		
+		//Reiniciamos la conexion con un reiniciar.bat
    var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
@@ -201,19 +204,30 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
        script_process.on('close', function (code) {
       console.log('child process exited with code ' + code);
        });
+	   console.log("reiniciamos servicio windows")
+	}
 
 
  });
 
- //Iniciamos ocnexion
+ //Iniciamos conexion
  if(ws.readyState===3 || ws.readyState===1 || ws.readyState===0 || ws.readyState===2){
+	  
  ws.on('open', function(){
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
+  conectado==true;
+  console.log('conectado'+conectado);
+ 
   });
 }
+   
+     
+     
+	
+    
 
 
 
@@ -300,7 +314,7 @@ myjson=JSON.stringify(alarma);
        
         comando=false;
       }
-       console.log(comando);
+       //console.log(comando);
        
     });
   
