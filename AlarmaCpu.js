@@ -21,11 +21,17 @@ var tiempo=30000;//cada 30 segundos lanza el evento.
 var WebSocket= require('ws');
 var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
-var rutaWINXP='c:/archivos de programa/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
-var rutaWINXPretail='c:/archivos de programa/igt microelectronics/Agora retail/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
-var rutaWIN7='c:/archivos de programa86/igt microelectronics/Agora/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
-var rutaWin7retail='c:/archivos de programa86/igt microelectronics/Agora retail/lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+
+var rutaWINXP="..\\Program Files\\IGT Microelectronics\\Agora\\lic_00000-00000-00000-00000-00000.xml";
+var rutaWINXPR="..\\Program Files\\IGT Microelectronics\\Agora\\li1_00000-00000-00000-00000-00000.xml";
+var rutaWINXPretail="..\\Program Files\\IGT Microelectronics\\Agora retail\\lic_00000-00000-00000-00000-00000.xml";
+var rutaWINXPretailR="..\\Program Files\\IGT Microelectronics\\Agora retail\\li1_00000-00000-00000-00000-00000.xml";
+var rutaWIN7="..\\Program Files (x86)\\IGT Microelectronics\\Agora\\lic_00000-00000-00000-00000-00000.xml";
+var rutaWIN7R="..\\Program Files (x86)\\IGT Microelectronics\\Agora\\li1_00000-00000-00000-00000-00000.xml";
+var rutaWin7retail="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail\\lic_00000-00000-00000-00000-00000.xml";
+var rutaWin7retailR="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail\\li1_00000-00000-00000-00000-00000.xml";
 var rutaActual='';
+var rutaActualR='';
 var alarma='';
 var mensaje='';
 var restaurar='';
@@ -35,11 +41,11 @@ var notificarJson='';
 var buscar='';
 var buscarJson='';
 var AlarmStatus=false;
-var conectado=true;
 var comando=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
+
  var ip_publica=publicIp.v4().then(ip => {
    console.log(ip);
    ip_publica=ip;
@@ -51,45 +57,46 @@ var plataforma=os.platform();
  console.log("S.0: "+plataforma);
 
   //Comprobamos que los ficheros existen.
-  if(os.plaftorm==='win32'){
+  if(plataforma==='win32'){
    fs.stat(rutaWINXP, function(err, stats) {
+      if (err) {
+        return console.error(err);
+    }
       rutaActual=rutaWINXP;
-      if (err && err.errno === 34) {
-       console.log('Fichero no existe');
-    } else {
-      //just in case there was a different error:
-      callback(err)
-    }
-   });
+      rutaActualR=rutaWINXPR;
+       console.log('Fichero existe win32'); 
+    });  
+  
 
+  
      fs.stat(rutaWINXPretail, function(err, stats) {
+       if (err) {
+       return console.error(err);
+    } 
       rutaActual=rutaWINXPretail;
-      if (err && err.errno === 34) {
-       console.log('Fichero no existe');
-    } else {
-      //just in case there was a different error:
-      callback(err)
-    }
+      rutaActualR=rutaWINXPR;
+      console.log('Fichero existe win32retail');
    });
-
+  
+   
       fs.stat(rutaWIN7, function(err, stats) {
+       if (err) {
+       return console.error(err);
+    } 
       rutaActual=rutaWIN7;
-      if (err && err.errno === 34) {
-       console.log('Fichero no existe');
-    } else {
-      //just in case there was a different error:
-      callback(err)
-    }
+      rutaActualR=rutaWIN7R;
+      console.log('Fichero existe win7');
    });
-        fs.stat(rutaWin7retail, function(err, stats) {
+      
+    
+      fs.stat(rutaWin7retail, function(err, stats) {
+     if (err) {
+     return console.error(err);
+    } 
       rutaActual=rutaWINXPretail;
-      if (err && err.errno === 34) {
-       console.log('Fichero no existe');
-    } else {
-      //just in case there was a different error:
-      callback(err)
-    }
-   });
+      rutaActualR=rutaWINXPretailR;
+      console.log('Fichero existe rutaWin7retail');
+    });
 
   }
  
@@ -187,9 +194,10 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
  //si no hay alarma
  ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
-   if(ws.readyState!==1){
-		
-		//Reiniciamos la conexion con un reiniciar.bat
+ //Si la conexion esta cerrada se reinicia
+ if(ws.readyState!==1){
+    
+    //Reiniciamos la conexion con un reiniciar.bat
    var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
@@ -204,35 +212,21 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
        script_process.on('close', function (code) {
       console.log('child process exited with code ' + code);
        });
-	   console.log("reiniciamos servicio windows")
-	}
-
+     console.log("reiniciamos servicio windows")
+  }
 
  });
 
- //Iniciamos conexion
+
  if(ws.readyState===3 || ws.readyState===1 || ws.readyState===0 || ws.readyState===2){
-	  
  ws.on('open', function(){
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
-  conectado==true;
-  console.log('conectado'+conectado);
- 
+
   });
 }
-   
-     
-     
-	
-    
-
-
-
-
-
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
     fs.appendFile('Alarma.txt',e.message, function(err) {
@@ -252,7 +246,7 @@ myjson=JSON.stringify(alarma);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
            comando=true;//Solo envia el mensaje una vez
-           oldPath='lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml'
+           oldPath=rutaActualR
            newPath=rutaActual;
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
@@ -271,8 +265,8 @@ myjson=JSON.stringify(alarma);
         console.log(message.comando);
         comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
-       var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
-      //var script_process = childProcess.spawn('test.bat',[],{env: process.env})// si fuera en windows.
+       //var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
+      var script_process = childProcess.spawn('notificacion.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
       console.log('stdout: ' + data);
@@ -288,7 +282,7 @@ myjson=JSON.stringify(alarma);
        });
 
            oldPath=rutaActual,
-           newPath='lic.xxxxx.xxxxx.xxxxx.xxxxx.xxxxx.xml';
+           newPath=rutaActualR;
            
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
@@ -314,7 +308,7 @@ myjson=JSON.stringify(alarma);
        
         comando=false;
       }
-       //console.log(comando);
+       console.log(comando);
        
     });
   
