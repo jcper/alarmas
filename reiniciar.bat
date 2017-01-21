@@ -1,1 +1,6 @@
-net stop "notificaciones" && net start "notificaciones"
+
+forever start AlarmaCpu.js 
+pause
+ 
+  
+  

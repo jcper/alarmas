@@ -42,6 +42,7 @@ var buscar='';
 var buscarJson='';
 var AlarmStatus=false;
 var comando=false;
+var conexion=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
@@ -57,6 +58,7 @@ var plataforma=os.platform();
  console.log("S.0: "+plataforma);
 
   //Comprobamos que los ficheros existen.
+  function FijarPath(){
   if(plataforma==='win32'){
    fs.stat(rutaWINXP, function(err, stats) {
       if (err) {
@@ -99,7 +101,7 @@ var plataforma=os.platform();
     });
 
   }
- 
+ };
  function Vigilante(limite,limiteRam){
 
 if(limite!==0.01 && limiteRam!==0.01){
@@ -195,7 +197,11 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
  ee.on('datos', function Vigilante(limite,limiteRam){
  console.log('Alarma testeando' + AlarmStatus);
  //Si la conexion esta cerrada se reinicia
- if(ws.readyState!==1){
+  if(ws.readyState===0){
+    conexion==true;
+   console.log(conexion+ws.readyState);
+ }
+ if( ws.readyState!==1 && !conexion){
     
     //Reiniciamos la conexion con un reiniciar.bat
    var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
@@ -213,20 +219,22 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
       console.log('child process exited with code ' + code);
        });
      console.log("reiniciamos servicio windows")
+      conexion=true;
   }
 
  });
 
 
- if(ws.readyState===3 || ws.readyState===1 || ws.readyState===0 || ws.readyState===2){
+
  ws.on('open', function(){
+  FijarPath();
   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
 
   });
-}
+
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
     fs.appendFile('Alarma.txt',e.message, function(err) {
@@ -269,7 +277,7 @@ myjson=JSON.stringify(alarma);
       var script_process = childProcess.spawn('notificacion.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
-      console.log('stdout: ' + data);
+     console.log('stdout: ' + data);
        });
 
       // Error output
@@ -281,7 +289,7 @@ myjson=JSON.stringify(alarma);
       console.log('child process exited with code ' + code);
        });
 
-           oldPath=rutaActual,
+          oldPath=rutaActual,
            newPath=rutaActualR;
            
        fs.rename(oldPath, newPath, function(err){
