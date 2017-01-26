@@ -22,14 +22,14 @@ var WebSocket= require('ws');
 var url='wss://agile-citadel-80189.herokuapp.com/';
 var ws = new WebSocket(url);
 
-var rutaWINXP="..\\Program Files\\IGT Microelectronics\\Agora\\lic_00000-00000-00000-00000-00000.xml";
-var rutaWINXPR="..\\Program Files\\IGT Microelectronics\\Agora\\li1_00000-00000-00000-00000-00000.xml";
-var rutaWINXPretail="..\\Program Files\\IGT Microelectronics\\Agora retail\\lic_00000-00000-00000-00000-00000.xml";
-var rutaWINXPretailR="..\\Program Files\\IGT Microelectronics\\Agora retail\\li1_00000-00000-00000-00000-00000.xml";
-var rutaWIN7="..\\Program Files (x86)\\IGT Microelectronics\\Agora\\lic_00000-00000-00000-00000-00000.xml";
-var rutaWIN7R="..\\Program Files (x86)\\IGT Microelectronics\\Agora\\li1_00000-00000-00000-00000-00000.xml";
-var rutaWin7retail="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail\\lic_00000-00000-00000-00000-00000.xml";
-var rutaWin7retailR="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail\\li1_00000-00000-00000-00000-00000.xml";
+var rutaWINXP="..\\Program Files\\IGT Microelectronics\\Agora";
+var rutaWINXPR=[];
+var rutaWINXPretail="..\\Program Files\\IGT Microelectronics\\Agora retail";
+var rutaWINXPretailR=[];
+var rutaWIN7="..\\Program Files (x86)\\IGT Microelectronics\\Agora";
+var rutaWIN7R=[];
+var rutaWin7retail="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail";
+var rutaWin7retailR=[];
 var rutaActual='';
 var rutaActualR='';
 var alarma='';
@@ -46,6 +46,7 @@ var conexion=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
+var path=require("path");
 
  var ip_publica=publicIp.v4().then(ip => {
    console.log(ip);
@@ -57,6 +58,8 @@ var plataforma=os.platform();
 
  console.log("S.0: "+plataforma);
 
+
+
   //Comprobamos que los ficheros existen.
   function FijarPath(){
   if(plataforma==='win32'){
@@ -65,7 +68,8 @@ var plataforma=os.platform();
         return console.error(err);
     }
       rutaActual=rutaWINXP;
-      rutaActualR=rutaWINXPR;
+      buscarlic(rutaActual);
+      buscarli1(rutaActual);
        console.log('Fichero existe win32'); 
     });  
   
@@ -76,7 +80,8 @@ var plataforma=os.platform();
        return console.error(err);
     } 
       rutaActual=rutaWINXPretail;
-      rutaActualR=rutaWINXPR;
+      buscarlic(rutaActual);
+      buscarli1(rutaActual);
       console.log('Fichero existe win32retail');
    });
   
@@ -86,7 +91,8 @@ var plataforma=os.platform();
        return console.error(err);
     } 
       rutaActual=rutaWIN7;
-      rutaActualR=rutaWIN7R;
+      buscarlic(rutaActual);
+      buscarli1(rutaActual);
       console.log('Fichero existe win7');
    });
       
@@ -96,12 +102,56 @@ var plataforma=os.platform();
      return console.error(err);
     } 
       rutaActual=rutaWINXPretail;
-      rutaActualR=rutaWINXPretailR;
+      buscarlic(rutaActual);
+      buscarli1(rutaActual);
       console.log('Fichero existe rutaWin7retail');
     });
 
   }
  };
+
+ function Buscarlic(rutaActual){
+  var p=rutaActual
+   fs.readdir(p,function(err,files)){
+     if(err){
+      throw err;
+     }
+     files.map(function(file)){
+       return path.join(p,file);
+      }).filter(function(file){
+        return fs.statSync(file).isFile();
+      }).forEach(function(file){
+        console.log("%s (%s)",file,path.basename(file));
+        var str=path.basename(file);
+        if(str.startsWith("lic")){
+           rutaActual.push(file);
+        };
+      });
+
+   });
+
+    function Buscarli1(rutaActual){
+  var p=rutaActual
+   fs.readdir(p,function(err,files)){
+     if(err){
+      throw err;
+     }
+     files.map(function(file)){
+       return path.join(p,file);
+      }).filter(function(file){
+        return fs.statSync(file).isFile();
+      }).forEach(function(file){
+        console.log("%s (%s)",file,path.basename(file));
+        var str=path.basename(file);
+        if(str.startsWith("li1")){
+           rutaActual.push(file);
+        };
+      });
+
+   });
+
+
+ }
  function Vigilante(limite,limiteRam){
 
 if(limite!==0.01 && limiteRam!==0.01){
@@ -237,7 +287,7 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
-    fs.appendFile('Alarma.txt',e.message, function(err) {
+    fs.appendFile('cliente.log',e.message, function(err) {
     if( err ){
         console.log( err );
     }
@@ -254,11 +304,16 @@ myjson=JSON.stringify(alarma);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
            comando=true;//Solo envia el mensaje una vez
-           oldPath=rutaActualR
-           newPath=rutaActual;
+            //Sustituye todos los li1 por lic
+          for(i=0; i<rutaActualR; i++){
+           oldPath=rutaActualR[i],
+           newPath=rutaActualR[i].replace("li1","lic");
+           
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
          });
+       };
+       
            console.log(mensaje.comando);
           restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
           restaurarJson=JSON.stringify(restaurar);
@@ -289,12 +344,15 @@ myjson=JSON.stringify(alarma);
       console.log('child process exited with code ' + code);
        });
 
-          oldPath=rutaActual,
-           newPath=rutaActualR;
+       //Sustituye todos los lic por li1
+          for(i=0; i<rutaActualR; i++){
+           oldPath=rutaActualR[i],
+           newPath=rutaActualR[i].replace("lic","li1");
            
        fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
          });
+     };
        notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
         for( i=0; i<30; i++ ){
