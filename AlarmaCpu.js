@@ -324,7 +324,7 @@ myjson=JSON.stringify(alarma);
          
        }
 
-      if(mensaje.user===user && mensaje.comando==='notificar'  ){
+      if(mensaje.user===user && mensaje.comando==='notificar'){
         console.log(message.comando);
         comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
@@ -359,7 +359,36 @@ myjson=JSON.stringify(alarma);
         ws.send(notificarJson);
          }   
         comando=false;
-      }
+      };
+
+       if(mensaje.user===user && mensaje.comando==='notificar0'){
+        console.log(message.comando);
+        comando=true;//Solo envia el mensaje una vez
+       // This line initiates bash
+       //var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
+      var script_process = childProcess.spawn('notificacion.bat',[],{env: process.env})// si fuera en windows.
+      // Echoes any command output 
+       script_process.stdout.on('data', function (data) {
+     console.log('stdout: ' + data);
+       });
+
+      // Error output
+       script_process.stderr.on('data', function (data) {
+       console.log('stderr: ' + data);
+       });
+       // Process exit
+       script_process.on('close', function (code) {
+      console.log('child process exited with code ' + code);
+       });
+
+      
+       notificar={"name":user,"comando":'notificar0',"date":new Date().toTimeString(),"ip":ip_publica};
+        notificarJson=JSON.stringify(notificar);
+        for( i=0; i<30; i++ ){
+        ws.send(notificarJson);
+         }   
+        comando=false;
+      };
 
        if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL' ){
         console.log(message.comando);
