@@ -112,11 +112,11 @@ var path=require("path");
 
  function Buscarlic(rutaActual){
   var p=rutaActual
-   fs.readdir(p,function(err,files)){
+   fs.readdir(p,function(err,files){
      if(err){
       throw err;
      }
-     files.map(function(file)){
+     files.map(function(file){
        return path.join(p,file);
       }).filter(function(file){
         return fs.statSync(file).isFile();
@@ -129,14 +129,14 @@ var path=require("path");
       });
 
    });
-
-    function Buscarli1(rutaActual){
-  var p=rutaActual
-   fs.readdir(p,function(err,files)){
+ };
+function Buscarli1(rutaActual){
+     var p=rutaActual
+   fs.readdir(p,function(err,files){
      if(err){
       throw err;
      }
-     files.map(function(file)){
+     files.map(function(file){
        return path.join(p,file);
       }).filter(function(file){
         return fs.statSync(file).isFile();
@@ -149,9 +149,8 @@ var path=require("path");
       });
 
    });
+ };
 
-
- }
  function Vigilante(limite,limiteRam){
 
 if(limite!==0.01 && limiteRam!==0.01){
