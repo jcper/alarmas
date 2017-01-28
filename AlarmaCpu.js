@@ -31,7 +31,7 @@ var rutaWIN7R=[];
 var rutaWin7retail="..\\Program Files (x86)\\IGT Microelectronics\\Agora retail";
 var rutaWin7retailR=[];
 var rutaActual='';
-var rutaActualR='';
+var rutaActualR=[];
 var alarma='';
 var mensaje='';
 var restaurar='';
@@ -68,8 +68,10 @@ var path=require("path");
         return console.error(err);
     }
       rutaActual=rutaWINXP;
-      buscarlic(rutaActual);
-      buscarli1(rutaActual);
+      Buscarlic(rutaActual);
+      if(rutaActualR.length<1){
+      Buscarli1(rutaActual);
+      };
        console.log('Fichero existe win32'); 
     });  
   
@@ -80,8 +82,10 @@ var path=require("path");
        return console.error(err);
     } 
       rutaActual=rutaWINXPretail;
-      buscarlic(rutaActual);
-      buscarli1(rutaActual);
+      Buscarlic(rutaActual);
+      if(rutaActualR.length<1){
+      Buscarli1(rutaActual);
+    };
       console.log('Fichero existe win32retail');
    });
   
@@ -91,8 +95,10 @@ var path=require("path");
        return console.error(err);
     } 
       rutaActual=rutaWIN7;
-      buscarlic(rutaActual);
-      buscarli1(rutaActual);
+      Buscarlic(rutaActual);
+      if(rutaActualR.length<1){
+      Buscarli1(rutaActual);
+    };
       console.log('Fichero existe win7');
    });
       
@@ -102,8 +108,10 @@ var path=require("path");
      return console.error(err);
     } 
       rutaActual=rutaWINXPretail;
-      buscarlic(rutaActual);
-      buscarli1(rutaActual);
+      Buscarlic(rutaActual);
+      if(rutaActualR.length<1){
+      Buscarli1(rutaActual);
+    };
       console.log('Fichero existe rutaWin7retail');
     });
 
@@ -124,7 +132,8 @@ var path=require("path");
         console.log("%s (%s)",file,path.basename(file));
         var str=path.basename(file);
         if(str.startsWith("lic")){
-           rutaActual.push(file);
+           console.log('fichero'+file);
+           rutaActualR.push(file);
         };
       });
 
@@ -144,7 +153,8 @@ function Buscarli1(rutaActual){
         console.log("%s (%s)",file,path.basename(file));
         var str=path.basename(file);
         if(str.startsWith("li1")){
-           rutaActual.push(file);
+            console.log('fichero'+file);
+           rutaActualR.push(file);
         };
       });
 
@@ -303,14 +313,19 @@ myjson=JSON.stringify(alarma);
       
        if(mensaje.user===user && mensaje.comando==='restaurar'){
            comando=true;//Solo envia el mensaje una vez
+            
             //Sustituye todos los li1 por lic
-          for(i=0; i<rutaActualR; i++){
-           oldPath=rutaActualR[i],
-           newPath=rutaActualR[i].replace("li1","lic");
-           
-       fs.rename(oldPath, newPath, function(err){
+        
+          for(i=0; i<=rutaActualR.length; i++){
+           console.log('licencia1'+rutaActualR[i]);
+           var ruta=rutaActualR.pop(); 
+           oldPath=ruta,
+           newPath=ruta.replace("li1","lic");
+           console.log('licencia'+rutaActualR.pop()); 
+         fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
-         });
+        });
+
        };
        
            console.log(mensaje.comando);
@@ -342,16 +357,20 @@ myjson=JSON.stringify(alarma);
        script_process.on('close', function (code) {
       console.log('child process exited with code ' + code);
        });
-
+       
        //Sustituye todos los lic por li1
-          for(i=0; i<rutaActualR; i++){
-           oldPath=rutaActualR[i],
-           newPath=rutaActualR[i].replace("lic","li1");
-           
-       fs.rename(oldPath, newPath, function(err){
+          for(i=0; i<=rutaActualR.length; i++){
+           console.log('licencia1'+rutaActualR[i]);
+           var ruta=rutaActualR.pop(); 
+           oldPath=ruta,
+           newPath=ruta.replace("lic","li1");
+           console.log('licencia'+rutaActualR.pop()); 
+         fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
-         });
-     };
+        });
+
+       };
+    
        notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
         for( i=0; i<30; i++ ){
