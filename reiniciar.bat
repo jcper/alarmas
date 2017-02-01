@@ -1,6 +1,6 @@
 
-forever start AlarmaCpu.js 
-pause
+forever restart AlarmaCpu.js 
+
  
   
   

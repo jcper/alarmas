@@ -4,6 +4,7 @@ var os = require('os');
 var ps = require('ps-nodejs');
 // Child process is required to spawn any kind of asynchronous process
 var childProcess = require("child_process");
+var forever = require('forever-monitor');//utilizar forever-monitor
 var eventos = require('events');
 var process= require('process');
 var util = require('util');
@@ -47,6 +48,11 @@ var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
 var path=require("path");
+ var child = new (forever.Monitor)('AlarmaCpu.js', {
+    max: 3,
+    silent: true,
+    args: []
+  });
 
  var ip_publica=publicIp.v4().then(ip => {
    console.log(ip);
@@ -263,20 +269,21 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
  if( ws.readyState!==1 && !conexion){
     
     //Reiniciamos la conexion con un reiniciar.bat
-   var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
+   //var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
-       script_process.stdout.on('data', function (data) {
-      console.log('stdout: ' + data);
-       });
+      // script_process.stdout.on('data', function (data) {
+      //console.log('stdout: ' + data);
+      // });
 
       // Error output
-       script_process.stderr.on('data', function (data) {
-       console.log('stderr: ' + data);
-       });
+       //script_process.stderr.on('data', function (data) {
+      // console.log('stderr: ' + data);
+       //});
        // Process exit
-       script_process.on('close', function (code) {
-      console.log('child process exited with code ' + code);
-       });
+      // script_process.on('close', function (code) {
+      //console.log('child process exited with code ' + code);
+      // });
+      child.start();
      console.log("reiniciamos servicio windows")
       conexion=true;
   }
