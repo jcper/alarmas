@@ -283,10 +283,16 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
       // script_process.on('close', function (code) {
       //console.log('child process exited with code ' + code);
       // });
-      child.start();
-     console.log("reiniciamos servicio windows")
+      child.restart();
+     console.log("reiniciamos servicio forever")
+     var d = new Date();
+      fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString(), function(err){
+       if( err ){
+        console.log( err );
+      };
+     });
       conexion=true;
-  }
+  };
 
  });
 
@@ -303,7 +309,8 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
-    fs.appendFile('cliente.log',e.message, function(err) {
+    var d = new Date();
+    fs.appendFile('cliente.log',e.message+d.toUTCString(), function(err) {
     if( err ){
         console.log( err );
     }
@@ -332,6 +339,20 @@ myjson=JSON.stringify(alarma);
          fs.rename(oldPath, newPath, function(err){
           if(err) throw err;
         });
+       var script_process = childProcess.spawn('restauracion.bat',[],{env: process.env})// si fuera en windows.
+      // Echoes any command output 
+       script_process.stdout.on('data', function (data) {
+     console.log('stdout: ' + data);
+       });
+
+      // Error output
+       script_process.stderr.on('data', function (data) {
+       console.log('stderr: ' + data);
+       });
+       // Process exit
+       script_process.on('close', function (code) {
+      console.log('child process exited with code ' + code);
+       });
 
        };
        
