@@ -366,12 +366,12 @@ myjson=JSON.stringify(alarma);
          
        }
 
-      if(mensaje.user===user && mensaje.comando==='notificar'){
+      if(mensaje.user===user && mensaje.comando==='desactivar'){
         console.log(message.comando);
         comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
        //var script_process = childProcess.spawn('/bin/bash',["test.sh"],{env: process.env});
-      var script_process = childProcess.spawn('notificacion.bat',[],{env: process.env})// si fuera en windows.
+      var script_process = childProcess.spawn('desactivacion.bat',[],{env: process.env})// si fuera en windows.
       // Echoes any command output 
        script_process.stdout.on('data', function (data) {
      console.log('stdout: ' + data);
@@ -399,15 +399,15 @@ myjson=JSON.stringify(alarma);
 
        };
     
-       notificar={"name":user,"comando":'notificar',"date":new Date().toTimeString(),"ip":ip_publica};
-        notificarJson=JSON.stringify(notificar);
+       desactivar={"name":user,"comando":'desactivar',"date":new Date().toTimeString(),"ip":ip_publica};
+        notificarJson=JSON.stringify(desactivar);
         for( i=0; i<30; i++ ){
         ws.send(notificarJson);
          }   
         comando=false;
       };
 
-       if(mensaje.user===user && mensaje.comando==='notificar0'){
+       if(mensaje.user===user && mensaje.comando==='notificar'){
         console.log(message.comando);
         comando=true;//Solo envia el mensaje una vez
        // This line initiates bash
