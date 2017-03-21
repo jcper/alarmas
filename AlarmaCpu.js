@@ -41,7 +41,9 @@ var notificar='';
 var notificarJson='';
 var buscar='';
 var buscarJson='';
-var AlarmStatus=false;
+var AlarmStatus1=false;//Flag de estado de cada alarma1 CPU
+var AlarmStatus2=false;//Flag de estado de cada alarma2 RAM
+var AlarmStatus4=false;//Flag de estado de la ruta de los ficheros.
 var comando=false;
 var conexion=false;
 var myjson='';
@@ -78,6 +80,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
       };
+       AlarmStatus4=true;
        console.log('Fichero existe win32'); 
     });  
   
@@ -92,6 +95,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
+      AlarmStatus4=true;
       console.log('Fichero existe win32retail');
    });
   
@@ -105,6 +109,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
+      AlarmStatus4=true;
       console.log('Fichero existe win7');
    });
       
@@ -118,6 +123,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
+      AlarmStatus4=true;
       console.log('Fichero existe rutaWin7retail');
     });
 
@@ -168,7 +174,8 @@ function Buscarli1(rutaActual){
  };
 
  function Vigilante(limite,limiteRam){
-
+if(AlarmStatus4){
+ console.log("stattus"+AlarmaStatus4);
 if(limite!==0.01 && limiteRam!==0.01){
 
 if(os.loadavg()[1]>limite){
@@ -177,7 +184,7 @@ console.log('Carga Cpu: ' +os.loadavg()[1]);
 console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
- AlarmStatus=true// se produce alarma.
+ AlarmStatus1=true// se produce alarma.
  alarma={"name":user,"alarma":1, "date":new Date().toTimeString(),"ip":ip_publica,};
 
  if(i<10){
@@ -215,7 +222,7 @@ console.log('Carga Cpu: ' +os.loadavg()[1]);
 console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
-AlarmStatus=true// se produce alarma.
+AlarmStatu2=true// se produce alarma.
 alarma={"name":user,"alarma":2, "date":new Date().toTimeString(),"ip":ip_publica};
 
 if(i<10){
@@ -244,23 +251,34 @@ if(i<10){
  console.log('Memoria Ram Libre  hace 5 minutos'+' Registro: '+i);
    }
  }
- if(!AlarmStatus){
+
+ if(!AlarmStatus1 && !AlarmStatus2){
 alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
   }
-} 
 
+  if(AlarmStatus1 && AlarmStatus2){
+alarma={"name":user,"alarma":3,"date":new Date().toTimeString(),"ip":ip_publica};
+  }
 
-//Se resetea AlarmStatus
+  if(AlarmStatus2 && os.freemem()>limiteRam ){
 
-if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
+    AlarmStatus2=false;//Se vuelve a restablecer el sistema sin alarmas
+  }
 
-    AlarmStatus=false;//Se vuelve a restablecer el sistema sin alarmas
-   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}//valores iniciales
+  if(AlarmStatus1 && os.loadavg()[1]<limite){
+
+  AlarmStatus1=false;
+  }
+}else{
+  alarma={"name":user,"alarma":4,"date":new Date().toTimeString(),"ip":ip_publica};
+
+ } 
+
 }
 
- //si no hay alarma
+//si no hay alarma
  ee.on('datos', function Vigilante(limite,limiteRam){
- console.log('Alarma testeando' + AlarmStatus);
+ console.log('Alarma testeando' + AlarmStatus4);
  //Si la conexion esta cerrada se reinicia
   if(ws.readyState===0){
     conexion==true;
@@ -300,7 +318,6 @@ if(AlarmStatus && os.freemem()>limiteRam && os.loadavg()[1]<limite){
 
  ws.on('open', function(){
   FijarPath();
-  alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica}
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
   console.log("cliente conectado");
