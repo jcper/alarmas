@@ -80,7 +80,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
       };
-       AlarmStatus4=true;
+       
        console.log('Fichero existe win32'); 
     });  
   
@@ -95,7 +95,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
-      AlarmStatus4=true;
+     
       console.log('Fichero existe win32retail');
    });
   
@@ -109,7 +109,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
-      AlarmStatus4=true;
+     
       console.log('Fichero existe win7');
    });
       
@@ -123,7 +123,7 @@ var path=require("path");
       if(rutaActualR.length<1){
       Buscarli1(rutaActual);
     };
-      AlarmStatus4=true;
+      
       console.log('Fichero existe rutaWin7retail');
     });
 
@@ -146,6 +146,7 @@ var path=require("path");
         if(str.startsWith("lic")){
            console.log('fichero'+file);
            rutaActualR.push(file);
+           AlarmStatus4=true;
         };
       });
 
