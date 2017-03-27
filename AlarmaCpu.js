@@ -175,7 +175,7 @@ function Buscarli1(rutaActual){
 
  function Vigilante(limite,limiteRam){
 if(AlarmStatus4){
- console.log("stattus"+AlarmaStatus4);
+ console.log("status"+AlarmStatus4);
 if(limite!==0.01 && limiteRam!==0.01){
 
 if(os.loadavg()[1]>limite){
@@ -320,7 +320,7 @@ alarma={"name":user,"alarma":3,"date":new Date().toTimeString(),"ip":ip_publica}
   FijarPath();
   myjson=JSON.stringify(alarma);
   ws.send(myjson);
-  console.log("cliente conectado");
+  console.log("cliente conectado" + user);
 
   });
 
