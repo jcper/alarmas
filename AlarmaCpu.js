@@ -44,13 +44,19 @@ var buscarJson='';
 var AlarmStatus1=false;//Flag de estado de cada alarma1 CPU
 var AlarmStatus2=false;//Flag de estado de cada alarma2 RAM
 var AlarmStatus4=false;//Flag de estado de la ruta de los ficheros.
+var AlarmStatus5=false;//Flag de estado desconexiones electricas.
+var AlarmStatus6=false;//Flag de estado desconexiones ethernet.
+var AlarmStatus6string='';
+var AlarmStatus5string='';
+var contadorElectrico=0;
+var contadorEthernet=0;
 var comando=false;
 var conexion=false;
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
 var path=require("path");
- var child = new (forever.Monitor)('AlarmaCpu.js', {
+var child = new (forever.Monitor)('AlarmaCpu.js', {
     max: 3,
     silent: true,
     args: []
@@ -143,7 +149,7 @@ var path=require("path");
       }).forEach(function(file){
         console.log("%s (%s)",file,path.basename(file));
         var str=path.basename(file);
-        if(str.startsWith("lic")){
+        if(str.startsWith("lic") && str!=='lic_00000-00000-00000-00000-00000.xml'){
            console.log('fichero'+file);
            rutaActualR.push(file);
            AlarmStatus4=true;
@@ -189,8 +195,8 @@ console.log('Memoria Libre: ' + os.freemem());
  alarma={"name":user,"alarma":1, "date":new Date().toTimeString(),"ip":ip_publica,};
 
  if(i<10){
- 	var data={};
-   data=alarma.name+alarma.alarma+alarma.date+alarma.ip;
+ 	var dia=new Date();
+  data=alarma.name+'-'+alarma.alarma+'-'+d.toUTCString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
@@ -214,7 +220,19 @@ console.log('Memoria Libre: ' + os.freemem());
 
   console.log('Sobrecarga cpu hace 5 minutos'+' Registro: '+i);
  }
+if(contadorEthernet>20){
+ 
+ AlarmStatus6=true// se produce alarma.
+ AlarmStatus6string=',6';
 
+}
+
+if(contadorEthernet>2){
+ 
+ AlarmStatus5=true// se produce alarma.
+ AlarmStatus5string=',5';
+
+}
 
 
 if(os.freemem()<limiteRam){
@@ -228,7 +246,8 @@ alarma={"name":user,"alarma":2, "date":new Date().toTimeString(),"ip":ip_publica
 
 if(i<10){
  	var data={};
-  data=alarma.name+alarma.alarma+alarma.date+alarma.ip;
+  var dia=new Date();
+  data=alarma.name+'-'+alarma.alarma+'-'+d.toUTCString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
@@ -254,11 +273,19 @@ if(i<10){
  }
 
  if(!AlarmStatus1 && !AlarmStatus2){
-alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":0+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
   }
 
   if(AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarma":3,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":3+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+  }
+
+  if(AlarmStatus1 && !AlarmStatus2){
+alarma={"name":user,"alarma":1+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+  }
+
+  if(!AlarmStatus1 && AlarmStatus2){
+alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
   }
 
   if(AlarmStatus2 && os.freemem()>limiteRam ){
@@ -305,7 +332,8 @@ alarma={"name":user,"alarma":3,"date":new Date().toTimeString(),"ip":ip_publica}
       child.restart();
      console.log("reiniciamos servicio forever")
      var d = new Date();
-      fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString(), function(err){
+      fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString()+'/n', function(err){
+        contadorEthernet ++;
        if( err ){
         console.log( err );
       };
@@ -468,6 +496,12 @@ myjson=JSON.stringify(alarma);
         comando=false;
       }
        console.log(comando);
+
+       if(mensaje.user===user && mensaje.comando==='conectado'){
+        contadorElectrico ++
+        
+       console.log('conectado: '+contadorElectrico);
+      }
        
     });
   
