@@ -52,6 +52,7 @@ var contadorElectrico=0;
 var contadorEthernet=0;
 var comando=false;
 var conexion=false;
+var InicioConexion={"name":user,"conexion":0,"date":new Date().toUTCString(),"ip":ip_publica};
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
@@ -347,9 +348,10 @@ alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new 
 
  ws.on('open', function(){
   FijarPath();
-  myjson=JSON.stringify(alarma);
+  myjson=JSON.stringify(InicioConexion);
   ws.send(myjson);
   console.log("cliente conectado" + user);
+  
 
   });
 
