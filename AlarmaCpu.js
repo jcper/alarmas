@@ -52,7 +52,7 @@ var contadorElectrico=0;
 var contadorEthernet=0;
 var comando=false;
 var conexion=false;
-var InicioConexion={"name":user,"conexion":0,"date":new Date().toUTCString(),"ip":ip_publica};
+var InicioConexion={"name":user,"conexion":contadorElectrico,"date":new Date().toUTCString(),"ip":ip_publica};
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
@@ -500,10 +500,10 @@ myjson=JSON.stringify(alarma);
        console.log(comando);
 
        if(mensaje.user===user && mensaje.comando==='conectado'){
-        contadorElectrico ++
-        
+        contadorElectrico ++;
+       console.log('conexion:' + mensaje);
        console.log('conectado: '+contadorElectrico);
-      }
+       }
        
     });
   
