@@ -198,7 +198,7 @@ console.log('Memoria Libre: ' + os.freemem());
 
  if(i<10){
  	var dia=new Date();
-  data=alarma.name+'-'+alarma.alarma+'-'+d.toUTCString()+'-'+alarma.ip+'/n ';
+  data=alarma.name+'-'+alarma.alarma+'-'+dia.toUTCString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
@@ -243,13 +243,13 @@ console.log('Carga Cpu: ' +os.loadavg()[1]);
 console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
-AlarmStatu2=true// se produce alarma.
+AlarmStatus2=true// se produce alarma.
 alarma={"name":user,"alarma":2, "date":new Date().toTimeString(),"ip":ip_publica};
 
 if(i<10){
  	var data={};
   var dia=new Date();
-  data=alarma.name+'-'+alarma.alarma+'-'+d.toUTCString()+'-'+alarma.ip+'/n ';
+  data=alarma.name+'-'+alarma.alarma+'-'+dia.toUTCString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
@@ -276,6 +276,7 @@ if(i<10){
 
  if(!AlarmStatus1 && !AlarmStatus2){
 alarma={"name":user,"alarma":0+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+    console.log('estoy aqui');
   }
 
   if(AlarmStatus1 && AlarmStatus2){
