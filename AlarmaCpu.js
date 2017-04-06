@@ -68,7 +68,7 @@ var child = new (forever.Monitor)('AlarmaCpu.js', {
    console.log(ip);
    ip_publica=ip;
     console.log(ip_publica);
-   alarma={"name":user,"alarma":0,"date":new Date().toTimeString(),"ip":ip_publica};
+   alarma={"name":user,"alarma":0,"date":new Date().toUTCString(),"ip":ip_publica};
   
  });
 
@@ -194,7 +194,7 @@ console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
  AlarmStatus1=true// se produce alarma.
- alarma={"name":user,"alarma":1, "date":new Date().toTimeString(),"ip":ip_publica,};
+ alarma={"name":user,"alarma":1, "date":new Date().toUTCString(),"ip":ip_publica,};
 
  if(i<10){
  	var dia=new Date();
@@ -229,7 +229,7 @@ if(contadorEthernet>20){
 
 }
 
-if(contadorEthernet>2){
+if(contadorElectrico>2){
  
  AlarmStatus5=true// se produce alarma.
  AlarmStatus5string=',5';
@@ -244,7 +244,7 @@ console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
 AlarmStatus2=true// se produce alarma.
-alarma={"name":user,"alarma":2, "date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":2, "date":new Date().toUTCString(),"ip":ip_publica};
 
 if(i<10){
  	var data={};
@@ -275,20 +275,20 @@ if(i<10){
  }
 
  if(!AlarmStatus1 && !AlarmStatus2){
-alarma={"name":user,"alarma":0+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":0+AlarmStatus5string+AlarmStatus6string,"date":new Date().toUTCString(),"ip":ip_publica};
     console.log('estoy aqui');
   }
 
   if(AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarma":3+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":3+AlarmStatus5string+AlarmStatus6string,"date":new Date().toUTCString(),"ip":ip_publica};
   }
 
   if(AlarmStatus1 && !AlarmStatus2){
-alarma={"name":user,"alarma":1+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":1+AlarmStatus5string+AlarmStatus6string,"date":new Date().toUTCString(),"ip":ip_publica};
   }
 
   if(!AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new Date().toTimeString(),"ip":ip_publica};
+alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new Date().toUTCString(),"ip":ip_publica};
   }
 
   if(AlarmStatus2 && os.freemem()>limiteRam ){
@@ -301,7 +301,7 @@ alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new 
   AlarmStatus1=false;
   }
 }else{
-  alarma={"name":user,"alarma":4,"date":new Date().toTimeString(),"ip":ip_publica};
+  alarma={"name":user,"alarma":4,"date":new Date().toUTCString(),"ip":ip_publica};
 
  } 
 
@@ -336,7 +336,6 @@ alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new 
      console.log("reiniciamos servicio forever")
      var d = new Date();
       fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString()+'\n', function(err){
-        contadorEthernet ++;
         myjson=JSON.stringify(ErrorEthernet);
        ws.send(myjson);
        if( err ){
@@ -409,7 +408,7 @@ myjson=JSON.stringify(alarma);
        };
        
            console.log(mensaje.comando);
-          restaurar={"name":user,"comando":'restaurar',"date":new Date().toTimeString(),"ip":ip_publica};
+          restaurar={"name":user,"comando":'restaurar',"date":new Date().toUTCString(),"ip":ip_publica};
           restaurarJson=JSON.stringify(restaurar);
           for( i=0; i<30; i++ ){
            ws.send(restaurarJson);
@@ -451,7 +450,7 @@ myjson=JSON.stringify(alarma);
 
        };
     
-       desactivar={"name":user,"comando":'desactivar',"date":new Date().toTimeString(),"ip":ip_publica};
+       desactivar={"name":user,"comando":'desactivar',"date":new Date().toUTCString(),"ip":ip_publica};
         notificarJson=JSON.stringify(desactivar);
         for( i=0; i<30; i++ ){
         ws.send(notificarJson);
@@ -480,7 +479,7 @@ myjson=JSON.stringify(alarma);
        });
 
       
-       notificar={"name":user,"comando":'notificar0',"date":new Date().toTimeString(),"ip":ip_publica};
+       notificar={"name":user,"comando":'notificar0',"date":new Date().toUTCString(),"ip":ip_publica};
         notificarJson=JSON.stringify(notificar);
         for( i=0; i<30; i++ ){
         ws.send(notificarJson);
@@ -491,7 +490,7 @@ myjson=JSON.stringify(alarma);
        if(mensaje.user===user && mensaje.comando==='buscar' || mensaje.comando==='buscar' && mensaje.user==='ALL' ){
         console.log(message.comando);
          comando=true;//Solo envia el mensaje una vez
-        buscar={"name":user,"comando":'buscar',"date":new Date().toTimeString(),"ip":ip_publica};
+        buscar={"name":user,"comando":'buscar',"date":new Date().toUTCString(),"ip":ip_publica};
         buscarJson=JSON.stringify(buscar);
 
          for( i=0; i<30; i++ ){
@@ -501,12 +500,18 @@ myjson=JSON.stringify(alarma);
        
         comando=false;
       }
-       console.log(comando);
+    
 
        if(mensaje.user===user && mensaje.comando==='conectado'){
         contadorElectrico=mensaje.contador_cliente;
        console.log('conexion:' + mensaje);
        console.log('conectado: '+contadorElectrico);
+       }
+
+       if(mensaje.user===user && mensaje.comando==='ErrorEthernet'){
+        contadorEthernet=mensaje.contador_cliente;
+       console.log('conexion:' + mensaje);
+       console.log('conectado: '+contadorEthernet);
        }
        
     });
