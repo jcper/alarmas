@@ -52,11 +52,11 @@ var contadorElectrico=0;
 var contadorEthernet=0;
 var comando=false;
 var conexion=false;
-var InicioConexion={"name":user,"conexion":contadorElectrico,"date":new Date().toUTCString(),"ip":ip_publica};
-var ErrorEthernet={"name":user,"ErrorEthernet":contadorEthernet,"date":new Date().toUTCString(),"ip":ip_publica};
 var myjson='';
 var user=os.hostname();//nombre de usuario
 var plataforma=os.platform();
+var InicioConexion={"name":user,"conexion":contadorElectrico,"date":new Date().toUTCString(),"ip":ip_publica};
+var ErrorEthernet={"name":user,"ErrorEthernet":contadorEthernet,"date":new Date().toUTCString(),"ip":ip_publica};
 var path=require("path");
 var child = new (forever.Monitor)('AlarmaCpu.js', {
     max: 3,
@@ -335,7 +335,7 @@ alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new 
       child.restart();
      console.log("reiniciamos servicio forever")
      var d = new Date();
-      fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString()+'/n', function(err){
+      fs.appendFile('cliente.log',"reinicio forever: "+d.toUTCString()+'\n', function(err){
         contadorEthernet ++;
         myjson=JSON.stringify(ErrorEthernet);
        ws.send(myjson);
