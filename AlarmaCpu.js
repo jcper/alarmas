@@ -504,7 +504,7 @@ myjson=JSON.stringify(alarma);
        console.log(comando);
 
        if(mensaje.user===user && mensaje.comando==='conectado'){
-        contadorElectrico ++;
+        contadorElectrico=mensaje.contador_cliente;
        console.log('conexion:' + mensaje);
        console.log('conectado: '+contadorElectrico);
        }
