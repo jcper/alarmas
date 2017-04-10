@@ -68,7 +68,7 @@ var child = new (forever.Monitor)('AlarmaCpu.js', {
    console.log(ip);
    ip_publica=ip;
     console.log(ip_publica);
-   alarma={"name":user,"alarma":0,"date":new Date().toString(),"ip":ip_publica};
+   alarma={"name":user,"alarmasC":[0,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
   
  });
 
@@ -198,7 +198,7 @@ console.log('Memoria Libre: ' + os.freemem());
 
  if(i<10){
  	var dia=new Date();
-  data=alarma.name+'-'+alarma.alarma+'-'+dia.toString()+'-'+alarma.ip+'/n ';
+  data=alarma.name+'-'+alarma.alarmasC+'-'+dia.toString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
@@ -249,7 +249,7 @@ alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string], "date"
 if(i<10){
  	var data={};
   var dia=new Date();
-  data=alarma.name+'-'+alarma.alarma+'-'+dia.toString()+'-'+alarma.ip+'/n ';
+  data=alarma.name+'-'+alarma.alarmasC+'-'+dia.toString()+'-'+alarma.ip+'/n ';
  	 fs.appendFile('Alarma.txt',data, function(err) {
     if( err ){
         console.log( err );
