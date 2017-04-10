@@ -46,8 +46,8 @@ var AlarmStatus2=false;//Flag de estado de cada alarma2 RAM
 var AlarmStatus4=false;//Flag de estado de la ruta de los ficheros.
 var AlarmStatus5=false;//Flag de estado desconexiones electricas.
 var AlarmStatus6=false;//Flag de estado desconexiones ethernet.
-var AlarmStatus6string;
-var AlarmStatus5string;
+var AlarmStatus6string=0;
+var AlarmStatus5string=0;
 var contadorElectrico=0;
 var contadorEthernet=0;
 var comando=false;
