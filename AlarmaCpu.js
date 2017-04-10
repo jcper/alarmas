@@ -16,7 +16,7 @@ var EmisorEventos = eventos.EventEmitter;
 var ee=new EmisorEventos();
 var readline = require('readline');
 var publicIp = require('public-ip');
-var limite=0.70;//carga cpu.
+var limite=0.80;//carga cpu.
 var limiteRam=1073741824;//1 Gb memoria libre
 var tiempo=30000;//cada 30 segundos lanza el evento.
 var WebSocket= require('ws');
@@ -46,8 +46,8 @@ var AlarmStatus2=false;//Flag de estado de cada alarma2 RAM
 var AlarmStatus4=false;//Flag de estado de la ruta de los ficheros.
 var AlarmStatus5=false;//Flag de estado desconexiones electricas.
 var AlarmStatus6=false;//Flag de estado desconexiones ethernet.
-var AlarmStatus6string='';
-var AlarmStatus5string='';
+var AlarmStatus6string;
+var AlarmStatus5string;
 var contadorElectrico=0;
 var contadorEthernet=0;
 var comando=false;
@@ -194,7 +194,7 @@ console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
  AlarmStatus1=true// se produce alarma.
- alarma={"name":user,"alarma":1, "date":new Date().toString(),"ip":ip_publica,};
+ alarma={"name":user,"alarmasC":[1,AlarmStatus5string,AlarmStatus6string], "date":new Date().toString(),"ip":ip_publica,};
 
  if(i<10){
  	var dia=new Date();
@@ -225,14 +225,14 @@ console.log('Memoria Libre: ' + os.freemem());
 if(contadorEthernet>20){
  
  AlarmStatus6=true// se produce alarma.
- AlarmStatus6string=',6';
+ AlarmStatus6string=6;
 
 }
 
 if(contadorElectrico>2){
  
  AlarmStatus5=true// se produce alarma.
- AlarmStatus5string=',5';
+ AlarmStatus5string=5;
 
 }
 
@@ -244,7 +244,7 @@ console.log('Tiempo [ms]: '+os.uptime());
 console.log('Memoria Total: ' + os.totalmem());
 console.log('Memoria Libre: ' + os.freemem());
 AlarmStatus2=true// se produce alarma.
-alarma={"name":user,"alarma":2, "date":new Date().toString(),"ip":ip_publica};
+alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string], "date":new Date().toString(),"ip":ip_publica};
 
 if(i<10){
  	var data={};
@@ -275,20 +275,20 @@ if(i<10){
  }
 
  if(!AlarmStatus1 && !AlarmStatus2){
-alarma={"name":user,"alarma":0+AlarmStatus5string+AlarmStatus6string,"date":new Date().toString(),"ip":ip_publica};
-    console.log('estoy aqui');
+alarma={"name":user,"alarmasC":[0,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
+    
   }
 
   if(AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarma":3+AlarmStatus5string+AlarmStatus6string,"date":new Date().toString(),"ip":ip_publica};
+alarma={"name":user,"alarmasC":[3,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
   }
 
   if(AlarmStatus1 && !AlarmStatus2){
-alarma={"name":user,"alarma":1+AlarmStatus5string+AlarmStatus6string,"date":new Date().toString(),"ip":ip_publica};
+alarma={"name":user,"alarmasC":[1,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
   }
 
   if(!AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarma":2+AlarmStatus5string+AlarmStatus6string,"date":new Date().toString(),"ip":ip_publica};
+alarma={"name":user,"alarmaC":[2,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
   }
 
   if(AlarmStatus2 && os.freemem()>limiteRam ){
