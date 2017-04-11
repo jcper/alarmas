@@ -316,28 +316,12 @@ alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string],"date":
    console.log(conexion+ws.readyState);
  }
  if( ws.readyState!==1 && !conexion){
-    
-    //Reiniciamos la conexion con un reiniciar.bat
-   //var script_process = childProcess.spawn('reiniciar.bat',[],{env: process.env})// si fuera en windows.
-      // Echoes any command output 
-      // script_process.stdout.on('data', function (data) {
-      //console.log('stdout: ' + data);
-      // });
-
-      // Error output
-       //script_process.stderr.on('data', function (data) {
-      // console.log('stderr: ' + data);
-       //});
-       // Process exit
-      // script_process.on('close', function (code) {
-      //console.log('child process exited with code ' + code);
-      // });
       child.restart();
      console.log("reiniciamos servicio forever")
      var d = new Date();
       fs.appendFile('cliente.log',"reinicio forever: "+d.toString()+'\n', function(err){
-        myjson=JSON.stringify(ErrorEthernet);
-       ws.send(myjson);
+        //myjson=JSON.stringify(ErrorEthernet);
+       //ws.send(myjson);
        if( err ){
         console.log( err );
       };
@@ -361,7 +345,7 @@ alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string],"date":
  ws.on('error', function (e) {
     console.log('cliente1 %d error: %s', e.message);
     var d = new Date();
-    fs.appendFile('cliente.log',e.message+d.toString(), function(err) {
+    fs.appendFile('cliente.log',e.message+d.toString()+'\n', function(err) {
     if( err ){
         console.log( err );
     }
