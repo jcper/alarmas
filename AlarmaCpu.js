@@ -503,13 +503,13 @@ myjson=JSON.stringify(alarma);
     
 
        if(mensaje.user===user && mensaje.comando==='conectado'){
-        contadorElectrico=mensaje.contador_cliente;
-       console.log('conexion:' + mensaje);
-       console.log('conectado: '+contadorElectrico);
+        contadorElectrico=mensaje.contador;
+       console.log('conexion: %s' + mensaje);
+       console.log(contadorElectrico);
        }
 
        if(mensaje.user===user && mensaje.comando==='ErrorEthernet'){
-        contadorEthernet=mensaje.contador_cliente;
+        contadorEthernet=mensaje.contador;
        console.log('conexion:' + mensaje);
        console.log('conectado: '+contadorEthernet);
        }
