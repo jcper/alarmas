@@ -288,7 +288,7 @@ alarma={"name":user,"alarmasC":[1,AlarmStatus5string,AlarmStatus6string],"date":
   }
 
   if(!AlarmStatus1 && AlarmStatus2){
-alarma={"name":user,"alarmaC":[2,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
+alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
   }
 
   if(AlarmStatus2 && os.freemem()>limiteRam ){
