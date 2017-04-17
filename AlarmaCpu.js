@@ -301,7 +301,7 @@ alarma={"name":user,"alarmasC":[2,AlarmStatus5string,AlarmStatus6string],"date":
   AlarmStatus1=false;
   }
 }else{
-  alarma={"name":user,"alarma":4,"date":new Date().toString(),"ip":ip_publica};
+  alarma={"name":user,"alarmasC":[4,AlarmStatus5string,AlarmStatus6string],"date":new Date().toString(),"ip":ip_publica};
 
  } 
 
