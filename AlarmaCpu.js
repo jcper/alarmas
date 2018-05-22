@@ -1,7 +1,9 @@
 //alarma de monitorizacion de procesos//
-
+const http = require('http');
 var os = require('os');
 var ps = require('ps-nodejs');
+// Global variables
+global.config = require('./config');
 // Child process is required to spawn any kind of asynchronous process
 var childProcess = require("child_process");
 var forever = require('forever-monitor');//utilizar forever-monitor
@@ -20,7 +22,7 @@ var limite=0.80;//carga cpu.
 var limiteRam=1073741824;//1 Gb memoria libre
 var tiempo=30000;//cada 30 segundos lanza el evento.
 var WebSocket= require('ws');
-var url='wss://agile-citadel-80189.herokuapp.com/';
+var url=global.config.alarma.websocket;
 var ws = new WebSocket(url);
 
 var rutaWINXP="..\\Program Files\\IGT Microelectronics\\Agora";
@@ -43,7 +45,7 @@ var buscar='';
 var buscarJson='';
 var AlarmStatus1=false;//Flag de estado de cada alarma1 CPU
 var AlarmStatus2=false;//Flag de estado de cada alarma2 RAM
-var AlarmStatus4=false;//Flag de estado de la ruta de los ficheros.
+var AlarmStatus4=global.config.alarma.agora;//Flag de estado de la ruta de los ficheros.
 var AlarmStatus5=false;//Flag de estado desconexiones electricas.
 var AlarmStatus6=false;//Flag de estado desconexiones ethernet.
 var AlarmStatus6string=0;
@@ -500,7 +502,36 @@ myjson=JSON.stringify(alarma);
        
     });
   
-   
+
+  //Cambiamos la confoguracion por webserver
+  const server = http.createServer((req, res) => {
+    if (req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString(); // convert Buffer to string
+    });
+    req.on('end', () => {
+        console.log(body);
+        res.end('ok');
+    });
+  }else{
+    res.end(`
+        <!doctype html>
+        <html>
+        <body>
+            <form action="/" method="post">
+                <input type="text" name="fname" /><br />
+                <input type="number" name="age" /><br />
+                <input type="file" name="photo" /><br />
+                <button>Save</button>
+            </form>
+        </body>
+        </html>
+    `);
+   }
+ });
+
+server.listen(3000); 
 
   //Lanzamos el emisor de eventos
 setInterval(function(){
